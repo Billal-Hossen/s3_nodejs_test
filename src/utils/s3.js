@@ -24,8 +24,9 @@ const uploadFileOnS3 = async (localFilePath, originalname) => {
 
     const response = await s3.upload(params).promise();
     fs.unlinkSync(localFilePath);
+    const publicUrl = `https://${process.env.AWS_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${response.Key}`;
 
-    return response
+    return { ...response, Location: publicUrl };
   } catch (error) {
     console.log(error);
     fs.unlinkSync(localFilePath);

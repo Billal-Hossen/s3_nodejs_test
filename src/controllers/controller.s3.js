@@ -19,8 +19,28 @@ const getAllUploadFiles = async (req, res) => {
     const files = await s3.listObjectsV2({ Bucket: process.env.AWS_BUCKET }).promise()
     res.status(201).json({ files: files.Contents, success: true })
   } catch (error) {
-
+    console.log("Error while get all the files", error)
   }
 }
 
-export { s3FileUpload, getAllUploadFiles }
+const downloadFile = async (req, res) => {
+  const filename = req.params.filename
+  try {
+    const response = await s3.getObject({ Bucket: process.env.AWS_BUCKET, Key: filename }).promise()
+    res.status(201).json({ file: response.Body, success: true })
+  } catch (error) {
+    console.log("Error while download the file", error)
+  }
+}
+
+const deleteFile = async (req, res) => {
+  const filename = req.params.filename
+  try {
+    await s3.deleteObjectTagging({ Bucket: process.env.AWS_BUCKET, Key: filename }).promise()
+    res.status(201).json({ message: "File deleted" })
+  } catch (error) {
+    console.log("Error while delete the file", error)
+  }
+}
+
+export { s3FileUpload, getAllUploadFiles, downloadFile, deleteFile }
